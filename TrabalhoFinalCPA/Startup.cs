@@ -13,6 +13,26 @@ namespace TrabalhoFinalCPA
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -21,6 +41,9 @@ namespace TrabalhoFinalCPA
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors();
+            app.UseCors("AllowAllOrigins");
 
             app.UseRouting();
 
