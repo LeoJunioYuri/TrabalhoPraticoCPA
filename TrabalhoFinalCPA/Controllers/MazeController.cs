@@ -8,7 +8,7 @@ using TrabalhoFinalCPA;
 namespace TrabalhoFinalCPA.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/MazeController")]
     public class MazeSolverController : Controller
     {
         [HttpPost]
@@ -16,9 +16,9 @@ namespace TrabalhoFinalCPA.Controllers
         {
             List<Tuple<int, int>> path = MazeSolver.SolveMaze(maze);
 
-            if (path.Count == 0)
+            if (path == null)
             {
-                return NotFound();
+                return NotFound("Não foi encontrado solução");
             }
 
             return Ok(path);

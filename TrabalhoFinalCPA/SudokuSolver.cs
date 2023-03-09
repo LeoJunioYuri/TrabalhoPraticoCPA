@@ -44,26 +44,24 @@ namespace TrabalhoFinalCPA
         {
             for (int i = 0; i < board.GetLength(1); i++)
             {
-                if (board[row, i] == num)
+                if (board[row, i] == num || board[i, col] == num)
+                {
                     return false;
+                }
             }
 
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                if (board[i, col] == num)
-                    return false;
-            }
+            int regionSize = (int)Math.Sqrt(board.GetLength(0));
+            int regionRowStart = (row / regionSize) * regionSize;
+            int regionColStart = (col / regionSize) * regionSize;
 
-            int sqrt = (int)Math.Sqrt(board.GetLength(0));
-            int boxRowStart = row - row % sqrt;
-            int boxColStart = col - col % sqrt;
-
-            for (int i = boxRowStart; i < boxRowStart + sqrt; i++)
+            for (int i = regionRowStart; i < regionRowStart + regionSize; i++)
             {
-                for (int j = boxColStart; j < boxColStart + sqrt; j++)
+                for (int j = regionColStart; j < regionColStart + regionSize; j++)
                 {
                     if (board[i, j] == num)
+                    {
                         return false;
+                    }
                 }
             }
 
@@ -71,5 +69,3 @@ namespace TrabalhoFinalCPA
         }
     }
 }
-
-
