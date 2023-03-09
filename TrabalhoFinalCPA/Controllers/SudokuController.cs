@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TrabalhoFinalCPA;
 
 namespace TrabalhoFinalCPA.Controllers
 {
@@ -10,31 +9,45 @@ namespace TrabalhoFinalCPA.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] int[][] board)
         {
-            // Convert jagged array to 2D array
-            int[,] board2D = new int[9, 9];
-            for (int i = 0; i < board.Length; i++)
+
+            int rows = board.Length;
+            int cols = board[0].Length;
+
+            int[,] matrix = new int[rows, cols];
+
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < board[i].Length; j++)
+                for (int j = 0; j < cols; j++)
                 {
-                    board2D[i, j] = board[i][j];
+                    matrix[i, j] = board[i][j];
                 }
             }
 
-            var solver = new SudokuSolver();
-            var solvedBoard = solver.Solve(board2D);
+            var solver = new SudokuSolver(matrix);
+            var solvedBoard = solver.Solve();
 
-            // Convert 2D array back to jagged array
-            int[][] solvedBoardJagged = new int[9][];
-            for (int i = 0; i < 9; i++)
+            if (!solvedBoard)
             {
-                solvedBoardJagged[i] = new int[9];
-                for (int j = 0; j < 9; j++)
+                return NotFound("Não foi encontrado solução");
+            }
+
+            int[,] solvedMatrix = solver.GetBoard();
+
+            int rowsResolvedMatrix = solvedMatrix.GetLength(0);
+            int colsResolvedMatrix = solvedMatrix.GetLength(1);
+
+            int[][] array = new int[rowsResolvedMatrix][];
+
+            for (int i = 0; i < rowsResolvedMatrix; i++)
+            {
+                array[i] = new int[colsResolvedMatrix];
+                for (int j = 0; j < colsResolvedMatrix; j++)
                 {
-                    solvedBoardJagged[i][j] = solvedBoard[i, j];
+                    array[i][j] = solvedMatrix[i, j];
                 }
             }
 
-            return Ok(solvedBoardJagged);
+            return Ok(array);
         }
     }
 }

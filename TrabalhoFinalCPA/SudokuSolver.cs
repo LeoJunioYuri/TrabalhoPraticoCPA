@@ -2,36 +2,42 @@
 
 namespace TrabalhoFinalCPA
 {
-    public class SudokuSolver
+    class SudokuSolver
     {
-        public int[,] Solve(int[,] board)
+        private const int SIZE = 9;
+
+        private int[,] board;
+
+        public SudokuSolver(int[,] board)
         {
-            SolveHelper(board, 0, 0);
-            return board;
+            this.board = board;
         }
 
-        private bool SolveHelper(int[,] board, int row, int col)
+        public int[,] GetBoard()
         {
-            if (col == board.GetLength(1))
-            {
-                col = 0;
-                row++;
+            return this.board;
+        }
 
-                if (row == board.GetLength(0))
-                    return true;
+        public bool Solve()
+        {
+            int row = 0;
+            int col = 0;
+
+            if (!FindUnassignedLocation(ref row, ref col))
+            {
+                return true;
             }
 
-            if (board[row, col] != 0)
-                return SolveHelper(board, row, col + 1);
-
-            for (int num = 1; num <= 9; num++)
+            for (int num = 1; num <= SIZE; num++)
             {
-                if (IsSafe(num, row, col, board))
+                if (IsSafe(row, col, num))
                 {
                     board[row, col] = num;
 
-                    if (SolveHelper(board, row, col + 1))
+                    if (Solve())
+                    {
                         return true;
+                    }
 
                     board[row, col] = 0;
                 }
@@ -40,32 +46,82 @@ namespace TrabalhoFinalCPA
             return false;
         }
 
-        private bool IsSafe(int num, int row, int col, int[,] board)
+        private bool FindUnassignedLocation(ref int row, ref int col)
         {
-            for (int i = 0; i < board.GetLength(1); i++)
+            for (row = 0; row < SIZE; row++)
             {
-                if (board[row, i] == num || board[i, col] == num)
+                for (col = 0; col < SIZE; col++)
                 {
-                    return false;
-                }
-            }
-
-            int regionSize = (int)Math.Sqrt(board.GetLength(0));
-            int regionRowStart = (row / regionSize) * regionSize;
-            int regionColStart = (col / regionSize) * regionSize;
-
-            for (int i = regionRowStart; i < regionRowStart + regionSize; i++)
-            {
-                for (int j = regionColStart; j < regionColStart + regionSize; j++)
-                {
-                    if (board[i, j] == num)
+                    if (board[row, col] == 0)
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
 
-            return true;
+            return false;
+        }
+
+        private bool UsedInRow(int row, int num)
+        {
+            for (int col = 0; col < SIZE; col++)
+            {
+                if (board[row, col] == num)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool UsedInCol(int col, int num)
+        {
+            for (int row = 0; row < SIZE; row++)
+            {
+                if (board[row, col] == num)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool UsedInBox(int boxStartRow, int boxStartCol, int num)
+        {
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    if (board[row + boxStartRow, col + boxStartCol] == num)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsSafe(int row, int col, int num)
+        {
+            return !UsedInRow(row, num)
+                && !UsedInCol(col, num)
+                && !UsedInBox(row - row % 3, col - col % 3, num);
+        }
+
+        public void PrintBoard()
+        {
+            for (int row = 0; row < SIZE; row++)
+            {
+                for (int col = 0; col < SIZE; col++)
+                {
+                    Console.Write(board[row, col] + " ");
+                }
+
+                Console.WriteLine();
+            }
         }
     }
 }
